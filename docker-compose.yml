@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Senha123
+      MYSQL_DATABASE: meubanco
+    volumes:
+      - ./banco.sql:/docker-entrypoint-initdb.d/banco.sql
+    ports:
+      - "3306:3306"
+
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    depends_on:
+      - db
+    deploy:
+      replicas: 3
+
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "4500:4500"
+    depends_on:
+      - app
